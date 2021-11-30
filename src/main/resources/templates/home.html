@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!--<head th:replace="fragments/header :: header-css">-->
+
+</head>
+
+<body>
+
+<div class="container" style="text-align: center">
+    <div class="row">
+        <nav style="display: flex ;justify-content: space-between">
+            <h2><a th:href="home">Homepage</a></h2>
+            <div style="padding: 20px 0 0 0">
+                <input type="text">
+                <input type="submit">
+            </div>
+
+            <h2 ><a th:href="cart"><i class="fas fa-cart-plus"></i></a></h2>
+        </nav>
+        <div class="card-deck" th:if="${!books.isEmpty()}">
+            <div class="card" th:each="book:${books}">
+                <img class="cart-img" th:if="${!book.getImage().isEmpty()}" th:src="${book.getImage()}">
+                <div class="card-body">
+                    <h4 class="card-title" th:text="${book.getTitle()}"></h4>
+                    <p class="card-text" th:text="${book.getSubtitle()}"></p>
+
+                </div>
+                <div class="card-footer">
+                    <p th:text="${book.getPrice()}"></p>
+                    <a th:href="${'cart/add/'+book.getIsbn13()}" class="btn" >add to card</a>
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
