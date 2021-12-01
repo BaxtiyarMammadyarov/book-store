@@ -1,27 +1,30 @@
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<!--<head th:replace="fragments/header :: header-css">-->
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
 </head>
 
 <body>
 
 <div class="container" style="text-align: center">
+    <nav style="display: flex ;justify-content: space-between">
+        <div><a th:href="home">Homepage</a></div>
+        <form class="example" action="/search">
+            <input type="text" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+        <div><a th:href="cart"><i class="fas fa-cart-plus"></i></a></div>
+    </nav>
     <div class="row">
-        <nav style="display: flex ;justify-content: space-between">
-            <h2><a th:href="home">Homepage</a></h2>
-            <div style="padding: 20px 0 0 0">
-                <input type="text">
-                <input type="submit">
-            </div>
 
-            <h2 ><a th:href="cart"><i class="fas fa-cart-plus"></i></a></h2>
-        </nav>
-        <div class="card-deck" th:if="${!books.isEmpty()}">
-            <div class="card" th:each="book:${books}">
-                <img class="cart-img" th:if="${!book.getImage().isEmpty()}" th:src="${book.getImage()}">
+        <div class="card-deck" th:if="${!bookPage.getContent().isEmpty()}"
+             style="display: flex ;justify-content: center">
+            <div class="card" th:each="book:${bookPage.getContent()}" style="width:200px">
+                <img class="cart-img" th:if="${!book.getImage().isEmpty}" th:src="${book.getImage()}">
                 <div class="card-body">
                     <h4 class="card-title" th:text="${book.getTitle()}"></h4>
                     <p class="card-text" th:text="${book.getSubtitle()}"></p>
@@ -29,16 +32,30 @@
                 </div>
                 <div class="card-footer">
                     <p th:text="${book.getPrice()}"></p>
-                    <a th:href="${'cart/add/'+book.getIsbn13()}" class="btn" >add to card</a>
+                    <a th:href="${'/cart/add/'+book.getIsbn13()}" class="btn">add to card</a>
 
                 </div>
 
             </div>
         </div>
 
+        <div th:if="${bookPage.totalPages > 0}" style="display: flex;justify-content: center">
+            <div class="page-item" th:classappend="${!(bookPage.number>1)? 'disabled' : ''}" style="padding: 10px">
+                <a class="page-link"
+                   th:href="@{/(size=${bookPage.size},pageNumber=${bookPage.getNumber()-1})}">Previous</a>
+            </div>
+            <div
+                    th:each="pageNumber : ${pageNumbers}" style="padding: 10px">
 
+                <a th:href="@{/(size=${bookPage.size}, pageNumber=${pageNumber})}" th:text="${pageNumber}"
+                   th:class="${pageNumber==bookPage.number + 1} ? 'active':''"></a>
+            </div>
+            <div class="page-item" th:classappend="${!(bookPage.number<bookPage.getTotalPages())? 'disabled' : ''}" style="padding: 10px">
+                <a class="page-link" th:href="@{/(size=${bookPage.size},pageNumber=${bookPage.getNumber()+1})}">Next</a>
+            </div>
+
+        </div>
     </div>
-
 
 </div>
 

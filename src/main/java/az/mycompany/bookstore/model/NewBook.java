@@ -14,6 +14,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewBook {
     int error;
+    int page;
     int total;
     List<BookResponse> books;
 

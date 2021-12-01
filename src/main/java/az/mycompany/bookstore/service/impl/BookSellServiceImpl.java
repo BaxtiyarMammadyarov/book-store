@@ -13,7 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +27,12 @@ public class BookSellServiceImpl implements BookSellService {
     @Override
     public void addBookToCart(String isbn13) {
         log.info("Started add");
-        Book book= client.getBookByIsbn13(isbn13);
-        if (book == null){
-           throw new BookNotFoundException("book not found");
-        }else if(repository.existsByIsbn13(isbn13)){
+       if(repository.existsByIsbn13(isbn13)){
             BookSell bookSell=repository.findByIsbn13(isbn13);
             bookSell.setCount(bookSell.getCount()+1);
             repository.save(bookSell);
         }else {
+            Book book= client.getBookByIsbn13(isbn13).orElseThrow(() -> new BookNotFoundException("book not found"));
             BookSell bookSell=BookSell.builder()
                     .id(1l)
                     .title(book.getTitle())
@@ -90,7 +88,7 @@ public class BookSellServiceImpl implements BookSellService {
                 .findAll()
                 .stream()
                 .forEach(bookSell -> bigDecimal
-                        .add(BigDecimal.valueOf(Double.parseDouble(bookSell.getPrice().substring(1)))));
+                        .add(BigDecimal.valueOf(Double.parseDouble(bookSell.getPrice().substring(1))*bookSell.getCount())));
         return bigDecimal;
     }
 
