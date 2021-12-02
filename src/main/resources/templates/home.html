@@ -17,7 +17,7 @@
             <input type="text" placeholder="Search.." name="search">
             <button type="submit"><i class="fa fa-search"></i></button>
         </form>
-        <div><a th:href="cart"><i class="fas fa-cart-plus"></i></a></div>
+        <div><a th:href="@{'/cart/{userId}'(userId=${userId})}"><i class="fas fa-cart-plus"></i></a></div>
     </nav>
     <div class="row">
 
@@ -32,7 +32,7 @@
                 </div>
                 <div class="card-footer">
                     <p th:text="${book.getPrice()}"></p>
-                    <a th:href="${'/cart/add/'+book.getIsbn13()}" class="btn">add to card</a>
+                    <a th:href="@{'/cart/add/{userId}/{isbn13}'(userId=${userId},isbn13=${book.getIsbn13()})}" class="btn">add to card</a>
 
                 </div>
 

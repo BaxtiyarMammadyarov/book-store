@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
@@ -28,4 +28,5 @@ public class Book {
     String image;
     String url;
     Pdf pdf;
+    int count;
 }

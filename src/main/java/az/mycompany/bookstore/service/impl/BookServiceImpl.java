@@ -15,11 +15,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 
 import java.awt.image.RescaleOp;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,34 +36,30 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    public Page<BookResponse> getAllBooks(int pageNumber, int size) {
-        List<BookResponse> books=client.getAll().getBooks();
-        int pageSize = size;
-        int currentPage =pageNumber;
-        int startItem = currentPage * pageSize;
-
-        List<BookResponse> list;
-        if (books.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, books.size());
-            list = books.subList(startItem, toIndex);
-        }
-
-        Page<BookResponse> bookPage
-                = new PageImpl<BookResponse>(list, PageRequest.of(currentPage, pageSize), books.size());
-
-        return bookPage;
+    public void getAllBooks(int pageNumber, int size,Model model) {
+        List<BookResponse> responses=client.getAll().getBooks();
+        Page<BookResponse> bookPage = pageValidation.getPage(responses,pageNumber,size);
+        modelInit(bookPage, model);
 
     }
 
     @Override
-    public Page<BookResponse> getSearch(String search, int pageNumber, int size) {
+    public void getSearch(String search, int pageNumber, int size, Model model) {
       List<BookResponse>responses=  client.getBookSearch(search).getBooks();
-      pageValidation.getPage(responses,pageNumber,size);
 
-        return  pageValidation.getPage(responses,pageNumber,size);
+        Page<BookResponse> bookPage = pageValidation.getPage(responses,pageNumber,size);
+        modelInit(bookPage, model);
     }
+    private void modelInit(Page page, Model model) {
+        model.addAttribute("bookPage", page);
 
-
+        int totalPages = page.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+            model.addAttribute("userId",'1');
+        }
+    }
 }

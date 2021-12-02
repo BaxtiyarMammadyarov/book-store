@@ -1,6 +1,11 @@
 package az.mycompany.bookstore.validation;
 
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +16,13 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PageValidation<T> {
+
+     Page<T> page;
 
  public Page<T> getPage(List<T> list, int pageNumber, int size){
      int pageSize = size;

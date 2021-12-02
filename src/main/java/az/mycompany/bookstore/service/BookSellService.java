@@ -10,16 +10,16 @@ import java.util.List;
 @Service
 public interface BookSellService {
 
-    void addBookToCart(String isbn13);
-    void getAll();
+    void addBookToCart(String isbn13,long id);
 
-    void removeBookFromCart(String isbn13);
 
-    void clearBooksInCart();
+    void removeBookFromCart(String isbn13,long id);
 
-    List<BookSellResponse> getAllBooks();
+    void clearBooksInCart(long id);
 
-    BigDecimal totalPrice();
+    List<BookSellResponse> getAllBooks(long id);
 
-    void cartCheckout();
+    BigDecimal totalPrice(long userId);
+
+    void cartCheckout(long id);
 }
