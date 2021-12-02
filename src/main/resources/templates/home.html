@@ -11,13 +11,13 @@
 <body>
 
 <div class="container" style="text-align: center">
-    <nav style="display: flex ;justify-content: space-between">
-        <div><a th:href="home">Homepage</a></div>
-        <form class="example" action="/search">
+    <nav style="display: flex ;justify-content: space-around">
+        <div><a th:href="home"><h3>Homepage</h3></a></div>
+        <form class="example" action="/search" style="padding: 10px 0 0 0">
             <input type="text" placeholder="Search.." name="search">
             <button type="submit"><i class="fa fa-search"></i></button>
         </form>
-        <div><a th:href="@{'/cart/{userId}'(userId=${userId})}"><i class="fas fa-cart-plus"></i></a></div>
+        <div><a th:href="@{'/cart/{userId}'(userId=${userId})}"><i class="fas fa-cart-plus" style="font-size: 1.5em ;padding: 10px 0 0 0"></i></a></div>
     </nav>
     <div class="row">
 

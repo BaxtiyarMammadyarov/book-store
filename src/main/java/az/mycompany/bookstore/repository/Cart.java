@@ -3,6 +3,7 @@ package az.mycompany.bookstore.repository;
 import az.mycompany.bookstore.model.Book;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -14,9 +15,10 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Cart {
-
+    @Id
     Long id;
-    List<Book>books;
+    Long userId;
+    List<Book> books;
 
 
 }
