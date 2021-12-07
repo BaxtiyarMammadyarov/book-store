@@ -1,33 +1,43 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-      crossorigin="anonymous" referrerpolicy="no-referrer"/>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<style href="D:\IdeaProjects\book-store\src\main\resources\static\css\cart.css"></style>
 </head>
 
 <body>
-<div class="container" style="text-align: center">
-
-    <div class="row">
-
-        <div class="card-deck" th:if="${books.isEmpty()}"
-             style="display: flex ;justify-content: center">
-            <div class="card" th:each="book:${books}" style="width:200px">
-                <img class="cart-img" th:if="${!book.getImage().isEmpty}" th:src="${book.getImage()}">
-                <div class="card-body">
-                    <h4 class="card-title" th:text="${book.getTitle()}"></h4>
-                    <p class="card-text" th:text="${book.getSubtitle()}"></p>
-
-                </div>
-
-            </div>
-        </div>
-
-
+<div class="CartContainer" style="text-align: center">
+    <div class="Header">
+        <h3 class="Heading">Shopping Cart</h3>
+        <h5 class="Action"><a th:src="@{'/cart/clear/{userId}'(userId=${userId})}">Remove all</a></h5>
     </div>
 
+    <div class="Cart-Items" th:each="book:${books}">
+        <div class="image-box">
+            <img th:src="${book.getImage()}" style=" height: 120px" />
+        </div>
+        <div class="about">
+            <h1 class="title" th:text="${book.getTitle()}"></h1>
+            <h3 class="subtitle" th:text="${book.getSubtitle()}"></h3>
+<!--            <img src="images/veg.png" style="height:30px" />-->
+        </div>
+        <div class="counter">
+            <div class="btn" ><a th:href="@{'/cart/increase/{userId}/{isbn13}'(userId=${userId},isbn13=${book.getIsbn13()})}">+</a></div>
+            <div class="count" th:text="${book.getCount()}"></div>
+            <div class="btn" ><a th:href="@{'/cart/remove/{userId}/{isbn13}'(userId=${userId},isbn13=${book.getIsbn13()})}">-</a></div>
+        </div>
+        <div class="prices">
+            <div class="amount" ><h2 th:text="${book.getPrice()}"></h2></div>
+
+        </div>
+    </div>
+
+    <hr>
+    <div class="checkout">
+        <div class="total">
+
+            <div class="total-amount" th:text="${totalPrice}">$6.18</div>
+        </div>
+        <button class="button">Checkout</button></div>
 </div>
 </body>
 

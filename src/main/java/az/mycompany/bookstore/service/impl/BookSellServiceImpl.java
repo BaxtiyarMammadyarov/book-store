@@ -15,8 +15,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,106 +24,100 @@ import java.util.stream.Collectors;
 public class BookSellServiceImpl implements BookSellService {
     private final BookClient client;
     private final CartRepository repository;
-    private final NextSequenceService sequenceService;
 
     @Override
     public void addBookToCart(String isbn13, long id) {
         log.info("Started add");
-        List<Book> books =new ArrayList<>();
-        Cart cart = repository.findByUserId(id).orElse(null);
-        if (cart!=null) {
-            log.info("if started");
-            boolean bool = false;
-            for (Book book : cart.getBooks()) {
-                log.info("for started");
-                if (book.getIsbn13().equals(isbn13)) {
-                    book.setCount(book.getCount() + 1);
-                } else {
-                    bool = true;
-                }
-            }
-            if (bool) {
-                Book book = client.getBookByIsbn13(isbn13).orElseThrow(() -> new BookNotFoundException("book not found"));
-                books.add(book);
-            }
-            cart.setBooks(books);
-            repository.insert(cart);
-        } else {
-            Book book = client.getBookByIsbn13(isbn13).orElseThrow(() -> new BookNotFoundException("book not found"));
-             books.add(book);
-             cart = Cart.builder()
-                     .id((long) sequenceService.getNextSequence("customSequences"))
-                    .userId(id)
-                    .books(books)
-                    .build();
-            repository.insert(cart);
+        boolean bool=false;
+        Cart cart;
+        if(repository.existsById(isbn13+id)){
+            cart=repository.findById(isbn13+id).orElseThrow(() -> new CartNotFoundException("cart not found"));
+            cart.setCount(cart.getCount()+1);
         }
-
+        else {
+            Book book=client.getBookByIsbn13(isbn13).orElseThrow(() -> new BookNotFoundException("book not found") );
+             cart= Cart.builder()
+                     .id(isbn13+id)
+                    .authors(book.getAuthors())
+                    .title(book.getTitle())
+                    .subtitle(book.getSubtitle())
+                    .desc(book.getDesc())
+                    .image(book.getImage())
+                    .publisher(book.getPublisher())
+                    .pages(book.getPages())
+                    .price(book.getPrice())
+                    .rating(book.getRating())
+                    .userId(id)
+                     .isbn13(book.getIsbn13())
+                    .isbn10(book.getIsbn10())
+                    .url(book.getUrl())
+                    .year(book.getYear())
+                    .count(1)
+                    .error(book.getError())
+                    .pdf(book.getPdf())
+                    .build();
+        }
+        repository.save(cart);
 
     }
 
 
     @Override
     public void removeBookFromCart(String isbn13, long id) {
-        Cart cart = repository.findByUserId(id).orElseThrow(() -> new CartNotFoundException("cart not found"));
-        List<Book>books= cart.getBooks();
-        int index=0;
-        for (Book book:books) {
-            index++;
-            if(book.getCount()==1&&book.getIsbn13().equals(isbn13)){
-                books.remove(index-1);
-                break;
-            }
-            else if(book.getCount()>1&&book.getIsbn13().equals(isbn13)) {
-                book.setCount(book.getCount()-1);
-            }
+        Cart cart=repository.findById(isbn13+id).orElseThrow(() -> new CartNotFoundException("cart not found"));
+        if(cart.getCount()>1){
+            cart.setCount(cart.getCount()-1);
+            repository.insert(cart);
+        }else {
+            repository.delete(cart);
         }
-        cart.setBooks(books);
-        repository.insert(cart);
+
     }
 
     @Override
     public void clearBooksInCart(long userId) {
-        repository.deleteByUserId(userId);
+//        List<Cart> cartList=repository.findAll().stream().filter(cart -> cart.getUserId()==userId).collect(Collectors.toList());
+        repository.findAll().stream().filter(cart -> cart.getUserId()==userId).forEach(cart -> repository.delete(cart));
+//        repository.deleteAll(cartList);
     }
 
     @Override
     public List<BookSellResponse> getAllBooks(long userId) {
-        log.info("service userId"+userId);
-        Cart cart =repository.findByUserId(userId).orElseThrow(() -> new CartNotFoundException("cart not found"));
-        log.info(cart);
-        List<BookSellResponse>responseList= cart.getBooks().stream().map(this::convertDocumentToModel).collect(Collectors.toList());
-        System.out.println(responseList);
-        return responseList;
+        log.info("getAllBook method started");
+        return repository.findAll().stream().filter(cart -> cart.getCount()>0&&cart.getUserId()==userId).map(this::convertDocumentToModel).collect(Collectors.toList());
+
     }
 
     @Override
-    public BigDecimal totalPrice(long userId) {
-        BigDecimal bigDecimal = new BigDecimal(0.0);
-       Cart cart =repository.getByUserId(userId);
-       cart.getBooks().stream()
-               .forEach(book -> bigDecimal
-                       .add(BigDecimal.valueOf(
-                               Double.parseDouble(book.getPrice().substring(1))*book.getCount())));
-        return bigDecimal;
+    public double totalPrice(long userId) {
+
+       List<Cart> cartList=repository.findAll().stream().filter(cart -> cart.getUserId()==userId).collect(Collectors.toList());
+       double sum=0.0;
+        for (Cart cart:cartList) {
+          sum+=Double.parseDouble(cart.getPrice().substring(1));
+
+        }
+        return sum;
     }
 
     @Override
     public void cartCheckout(long userId) {
+
         repository.deleteByUserId(userId);
     }
 
-    private BookSellResponse convertDocumentToModel(Book book) {
+    private BookSellResponse convertDocumentToModel(Cart cart) {
         return BookSellResponse.builder()
-                .title(book.getTitle())
-                .subtitle(book.getSubtitle())
-                .image(book.getImage())
-                .isbn13(book.getIsbn13())
-                .price(book.getPrice())
-                .url(book.getUrl())
-                .count(book.getCount())
+                .title(cart.getTitle())
+                .subtitle(cart.getSubtitle())
+                .image(cart.getImage())
+                .isbn13(cart.getIsbn13())
+                .price(cart.getPrice())
+                .url(cart.getUrl())
+                .count(cart.getCount())
                 .build();
     }
+
 
 
 

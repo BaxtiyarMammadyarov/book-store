@@ -19,7 +19,7 @@ public interface BookSellService {
 
     List<BookSellResponse> getAllBooks(long id);
 
-    BigDecimal totalPrice(long userId);
+    double totalPrice(long userId);
 
     void cartCheckout(long id);
 }

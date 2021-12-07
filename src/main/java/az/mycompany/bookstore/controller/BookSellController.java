@@ -26,29 +26,36 @@ public class BookSellController {
         return "cart";
     }
 
+
     @GetMapping("/cart/add/{userId}/{isbn13}")
     public String addProductToCart(@PathVariable("userId")long userId,@PathVariable("isbn13") String isbn13 ){
-        log.info("start controller"+ isbn13);
-         service.addBookToCart(isbn13, userId);
+        service.addBookToCart(isbn13, userId);
         return "redirect:/home";
+    }
+    @GetMapping("/cart/increase/{userId}/{isbn13}")
+    public String increaseProductToCart(@PathVariable("userId")long userId,@PathVariable("isbn13") String isbn13 ){
+        service.addBookToCart(isbn13, userId);
+        return "redirect:/cart/"+userId;
     }
 
     @GetMapping("/cart/remove/{userId}/{isbn13}")
     public String removeBookFromCart(@PathVariable("userId")long userId,@PathVariable("isbn13") String isbn13 ){
          service.removeBookFromCart(isbn13,userId);
-        return "redirect:/cart";
+        return "redirect:/cart/"+userId;
     }
     @GetMapping("/cart/clear/{userId}")
     public String clearBooksInCart(@PathVariable("userId")long userId){
       service.clearBooksInCart(userId);
-        return "redirect:/cart";
+        return "redirect:/cart/"+userId;
     }
 
     @GetMapping("/cart/checkout/{userId}")
     public String cartCheckout(@PathVariable("userId")long userId){
      service.cartCheckout(userId);
 
-        return "redirect:/cart";
+        return "redirect:/cart/"+userId;
     }
+
+
 
 }
